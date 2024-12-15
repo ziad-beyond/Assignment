@@ -2,7 +2,7 @@ import json
 
 # Example dictionary
 dictionary = {
-    "name": "ZIAD",
+    "name": "Ziad",
     "age": 24,
     "city": "Riyadh"
 }

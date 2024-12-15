@@ -4,7 +4,7 @@ import json
 File="pokemon_data.json"
 
 def fetchAndSave():
-    # URL for the Pokemon
+    # URL the Pokemon
     API_URL = "https://pokeapi.co/api/v2/pokemon?limit=10"
     # Send GET request to Pokemon API
     response=requests.get(API_URL)

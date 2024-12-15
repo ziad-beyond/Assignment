@@ -15,7 +15,7 @@ def saveBook(books):
     with open(FILE_PATH,"w")as file:
         json.dump(books,file,indent=4)
 
-# Display all books in a nicely formatted table.
+# Display books in a nicely formatted table.
 def displayBook(books):
     if not books:
         print("No books available.")
