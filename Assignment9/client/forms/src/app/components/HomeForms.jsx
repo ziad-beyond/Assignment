@@ -23,7 +23,7 @@ const HomeForms = () => {
     const fetchForms = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/get_forms?user_id=${user.id}`
+          `http://localhost:5000/forms?user_id=${user.id}`
         );
         const data = await response.json();
 

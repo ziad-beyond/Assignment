@@ -15,7 +15,7 @@ const FormPage = () => {
   useEffect(() => {
     const fetchForm = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/get_form/${id}`);
+        const response = await fetch(`http://localhost:5000/forms/${id}`);
         if (!response.ok) throw new Error("Form not found");
         const data = await response.json();
         setForm(data);
@@ -32,7 +32,7 @@ const FormPage = () => {
       const fetchReplies = async () => {
         try {
           const response = await fetch(
-            `http://localhost:5000/get_replies/${form.id}`
+            `http://localhost:5000/submissions/${form.id}`
           );
           if (!response.ok) throw new Error("Replies not found");
           const data = await response.json();

@@ -102,7 +102,7 @@ def add_form():
     return jsonify({ "message": "Form created successfully",
                      "form": { "id": form_id, "user_id": user_id, "title": title, "description": description, "fields": fields } }),201
 
-@app.route('/get_forms',methods=['GET'])
+@app.route('/forms',methods=['GET'])
 def get_forms():
     user_id=request.args.get('user_id')
 
@@ -118,7 +118,7 @@ def get_forms():
     return jsonify(forms_list),200
 
 
-@app.route('/get_form/<int:id>', methods=['GET'])
+@app.route('/forms/<int:id>', methods=['GET'])
 def get_form(id):
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
@@ -132,7 +132,7 @@ def get_form(id):
     else:
         return jsonify({"message": "Form not found"}), 404
     
-@app.route('/submit_form/<int:id>', methods=['POST'])
+@app.route('/submissions/<int:id>', methods=['POST'])
 def submit_form(id):
     data = request.get_json()
     print("Received data:", data)  
@@ -160,7 +160,7 @@ def submit_form(id):
         conn.close() 
     return response
 
-@app.route('/get_replies/<int:form_id>', methods=['GET'])
+@app.route('/submissions/<int:form_id>', methods=['GET'])
 def get_replies(form_id):
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()

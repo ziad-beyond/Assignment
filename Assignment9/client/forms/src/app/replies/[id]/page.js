@@ -15,7 +15,7 @@ const ReplyPage = () => {
     const fetchData = async () => {
       if (id) {
         try {
-          const response = await fetch(`http://localhost:5000/get_form/${id}`);
+          const response = await fetch(`http://localhost:5000/forms/${id}`);
           const data = await response.json();
           setForm(data);
         } catch (error) {
@@ -52,7 +52,7 @@ const ReplyPage = () => {
     };
 
     try {
-      const response = await fetch(`http://localhost:5000/submit_form/${id}`, {
+      const response = await fetch(`http://localhost:5000/submissions/${id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(submissionData),
@@ -144,12 +144,14 @@ const ReplyPage = () => {
                 )}
               </div>
             ))}
+            <div className="flex justify-center">
             <button
               type="submit"
-              className="btn bg-primary text-white px-6 py-3 w-full rounded-md hover:bg-blue-600"
+              className="btn bg-primary text-white px-6 py-3  rounded-md hover:bg-blue-600"
             >
               Submit
             </button>
+            </div>
           </form>
         </div>
       </div>
