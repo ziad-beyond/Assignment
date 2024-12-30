@@ -3,15 +3,33 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { z } from "zod";
+
+const schema = z.object({
+  email: z.string().email("Invalid email format"),
+  password: z.string().min(8, "Password must be at least 8 characters long"),
+});
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState({});
+  const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const result = schema.safeParse({ email, password });
+    if (!result.success) {
+      const validationErrors = {}; 
+      result.error.errors.forEach((error) => {
+       validationErrors[error.path[0]] = error.message;
+       });
+      setErrors(validationErrors);
+      return;
+    }
+
     const response = await fetch('http://localhost:5000/signin', {
       method: 'POST',
       headers: {
@@ -25,11 +43,14 @@ const SignIn = () => {
     if (response.ok) {
       router.push('/forms');
     } else {
-      console.log(`Sign-in failed: ${data.message}`);
-      setError(data.message);
+      setErrorMessage(data.message);
     }
   };
-
+  const handleInputChange = (setter) => (e) => {
+    setter(e.target.value);
+    setErrors({});
+    setErrorMessage("");
+  };
   return (
     <>
       <section className="bg-gray-50">
@@ -58,15 +79,16 @@ const SignIn = () => {
                     Your email
                   </label>
                   <input
-                    type="email"
                     name="email"
                     id="email"
                     className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                     placeholder="name@gmail.com"
-                    required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
+                  {errors.email && (
+                    <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                  )}
                 </div>
                 <div>
                   <label
@@ -81,10 +103,12 @@ const SignIn = () => {
                     id="password"
                     placeholder="••••••••"
                     className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                    required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
+                  {errors.password && (
+                    <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+                  )}
                 </div>
                 <button
                   type="submit"
@@ -92,8 +116,8 @@ const SignIn = () => {
                 >
                   Sign in
                 </button>
-                {error && (
-                  <p className="text-sm font-light text-red-500">{error}</p>
+                {errorMessage && (
+                  <p className="text-red-500 text-sm mt-1">{errorMessage}</p>
                 )}
                 <p className="text-sm font-light text-gray-500">
                   Don’t have an account yet?{' '}

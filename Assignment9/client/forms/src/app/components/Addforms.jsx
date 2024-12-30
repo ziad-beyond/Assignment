@@ -1,24 +1,43 @@
 'use client';
 
-import { useState, useEffect } from "react";
-import NavBar from '../components/NavBar';
+import React, { useState } from "react";
 import { useRouter } from 'next/navigation';
+import { z } from 'zod';
+
+const formSchema = z.object({
+  title: z.string().min(3, "Title must be at least 3 characters long"),
+  description: z.string().min(5, "Description must be at least 5 characters long"),
+  fields: z.array(
+    z.object({
+      type: z.enum(["text", "checkbox", "dropdown"]),
+      label: z.string().min(1, "Label is required"),
+      options: z.array(z.string()).optional()
+    }).refine((data) => {
+      if ((data.type === "checkbox" || data.type === "dropdown") && (!data.options || data.options.length === 0)) {
+        return false;
+      }
+      return true;
+    }, {
+      message: "Options are required for checkbox and dropdown fields",
+      path: ["options"]
+    })
+  ).min(1, "Fields must contain at least one field")
+});
 
 export default function FormBuilder() {
   const [formFields, setFormFields] = useState([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [selectedFieldType, setSelectedFieldType] = useState("text");
+  const [errors, setErrors] = useState({});
   const router = useRouter();
 
   const handleAddField = () => {
     const newField = {
       type: selectedFieldType,
-      value:
-        selectedFieldType === "checkbox" || selectedFieldType === "dropdown" ? [] : "",
+      value: selectedFieldType === "checkbox" || selectedFieldType === "dropdown" ? [] : "",
       label: "",
-      options:
-        selectedFieldType === "checkbox" || selectedFieldType === "dropdown" ? [] : null,
+      options: selectedFieldType === "checkbox" || selectedFieldType === "dropdown" ? [] : null,
     };
     setFormFields((prevFields) => [...prevFields, newField]);
   };
@@ -53,6 +72,26 @@ export default function FormBuilder() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    const result = formSchema.safeParse({
+      title,
+      description,
+      fields: formFields.map(field => ({
+        type: field.type,
+        label: field.label,
+        options: field.options || []
+      }))
+    });
+
+    if (!result.success) {
+      const validationErrors = result.error.errors.reduce((acc, { path, message }) => {
+        acc[path.join('.')] = message;
+        return acc;
+      }, {});
+      setErrors(validationErrors);
+      return;
+    }
+
     const response = await fetch('http://localhost:5000/get_user', {
       method: 'GET',
       credentials: 'include',
@@ -86,8 +125,6 @@ export default function FormBuilder() {
     }
   };
 
-
-
   return (
     <>
       <div className="min-h-screen bg-white w-full flex justify-center p-10">
@@ -102,6 +139,9 @@ export default function FormBuilder() {
                 onChange={(e) => setTitle(e.target.value)}
                 className="input input-bordered w-full mt-2 bg-white"
               />
+              {errors.title && (
+                <p className="text-red-500 text-sm mt-1">{errors.title}</p>
+              )}
             </div>
             <div className="mb-4">
               <label className="block text-gray-700">Description</label>
@@ -110,6 +150,9 @@ export default function FormBuilder() {
                 onChange={(e) => setDescription(e.target.value)}
                 className="textarea textarea-bordered w-full mt-2 bg-white"
               />
+              {errors.description && (
+                <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+              )}
             </div>
 
             {formFields.map((field, index) => (
@@ -133,6 +176,9 @@ export default function FormBuilder() {
                   placeholder="Enter question"
                   className="input input-bordered w-full mt-2 bg-white"
                 />
+                {errors[`fields.${index}.label`] && (
+                  <p className="text-red-500 text-sm mt-1">{errors[`fields.${index}.label`]}</p>
+                )}
                 {field.type === "text" && (
                   <input
                     type="text"
@@ -176,6 +222,9 @@ export default function FormBuilder() {
                     >
                       Add Option
                     </button>
+                    {errors[`fields.${index}.options`] && (
+                      <p className="text-red-500 text-sm mt-1">{errors[`fields.${index}.options`]}</p>
+                    )}
                   </div>
                 )}
               </div>
@@ -200,6 +249,8 @@ export default function FormBuilder() {
                 Add Field
               </button>
             </div>
+            {errors.fields && <p className="text-red-500 text-sm mt-1">{errors.fields}</p>}
+
             <button type="submit" className="btn bg-primary text-white mt-4">
               Submit
             </button>
@@ -207,5 +258,4 @@ export default function FormBuilder() {
         </div>
       </div>
     </>
-  );
-}
+  )};

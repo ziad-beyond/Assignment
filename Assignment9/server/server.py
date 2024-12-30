@@ -52,13 +52,32 @@ def signup():
     email = data.get('email')
     password = data.get('password')
 
+    if not name:
+        return jsonify({"message": "Name is required"}), 400
+    if not email:
+        return jsonify({"message": "Email is required"}), 400
+    if not password:
+        return jsonify({"message": "Password is required"}), 400
+
+    email_regex = r'^\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+    if not re.match(email_regex, email):
+        return jsonify({"message": "Invalid email format"}), 400
+
+    if len(password) < 8:
+        return jsonify({"message": "Password must be at least 8 characters long"}), 400
+
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
+    cursor.execute('SELECT id FROM users WHERE email = ?', (email,))
+    existing_user = cursor.fetchone()
+    if existing_user:
+        return jsonify({"message": "Email already in use"}), 400
+
     cursor.execute('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', (name, email, password))
     user_id = cursor.lastrowid
     conn.commit()
     conn.close()
-    
+
     return jsonify({
         "message": "User created successfully",
         "user": {
@@ -73,6 +92,15 @@ def signin():
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')
+    if not email:
+        return jsonify({"message": "Email is required"}), 400
+    if not password:
+        return jsonify({"message": "Password is required"}), 400
+
+    email_regex = r'^\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+    if not re.match(email_regex, email):
+        return jsonify({"message": "Invalid email format"}), 400
+
 
     conn = sqlite3.connect('database.db') 
     cursor = conn.cursor()
@@ -108,6 +136,13 @@ def add_form():
     title = data.get('title')
     description = data.get('description')
     fields = data.get('fields')
+
+    if not title or not description or not fields:
+      return jsonify({"message": "All fields (title, description, fields) are required"}), 400
+    if len(title) < 1: 
+        return jsonify({"message": "Title must be at least 1 characters long"}), 400
+    if len(description) < 3:
+        return jsonify({"message": "Description must be at least 3 characters long"}),400
 
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
