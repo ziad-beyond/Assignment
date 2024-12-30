@@ -66,7 +66,7 @@ const ReplyPage = () => {
     };
 
     try {
-      const response = await fetch(`http://localhost:5000/submissions/${id}`, {
+      const response = await fetch(`http://localhost:5000/forms/${id}/submissions/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: 'include',

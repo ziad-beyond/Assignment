@@ -2,6 +2,7 @@ from flask import Flask, json, request, jsonify, session, make_response
 from flask_cors import CORS
 import sqlite3
 import os
+import re
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -152,7 +153,7 @@ def get_form(id):
     else:
         return jsonify({"message": "Form not found"}), 404
 
-@app.route('/submissions/<int:id>', methods=['POST'])
+@app.route('/forms/<int:id>/submissions/', methods=['POST'])
 def submit_form(id):
     data = request.get_json()
     formData = data.get('formData')
@@ -176,7 +177,7 @@ def submit_form(id):
         conn.close()
     return response
 
-@app.route('/submissions/<int:form_id>', methods=['GET'])
+@app.route('/forms/<int:form_id>/submissions/', methods=['GET'])
 def get_replies(form_id):
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()

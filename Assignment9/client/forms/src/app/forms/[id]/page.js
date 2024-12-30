@@ -54,7 +54,7 @@ const FormPage = () => {
     if (form) {
       const fetchReplies = async () => {
         try {
-          const response = await fetch(`http://localhost:5000/submissions/${form.id}`, {
+          const response = await fetch(`http://localhost:5000/forms/${form.id}/submissions/`, {
             method: 'GET',
             credentials: 'include',
           });
