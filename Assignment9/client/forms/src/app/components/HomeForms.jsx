@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useEffect, useState } from "react";
 import { Plus } from "react-feather";
@@ -11,35 +11,36 @@ const HomeForms = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
 
-
-
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (!user) {
-      router.push("/signin");
-      return;
-    }
+    const fetchUser = async () => {
+    
+        const fetchForms = async () => {
+          try {
+            const formsResponse = await fetch(
+              `http://localhost:5000/forms`, {
+                method: 'GET',
+                credentials: 'include',
+              }
+            );
+            const formsData = await formsResponse.json();
 
-    const fetchForms = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:5000/forms?user_id=${user.id}`
-        );
-        const data = await response.json();
+            if (formsResponse.ok) {
+              setFormList(formsData);
+            } else {
+              console.error("Error fetching forms:", formsData.message);
+            }
+          } catch (error) {
+            console.error("Error:", error);
+          } finally {
+            setLoading(false);
+          }
+        };
 
-        if (response.ok) {
-          setFormList(data);
-        } else {
-          console.error("Error fetching forms:", data.message);
-        }
-      } catch (error) {
-        console.error("Error:", error);
-      } finally {
-        setLoading(false);
-      }
+        fetchForms();
+      
     };
 
-    fetchForms();
+    fetchUser();
   }, [router]);
 
   return (

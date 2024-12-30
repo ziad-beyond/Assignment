@@ -1,8 +1,9 @@
-"use client";
+'use client';
 
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import NavBar from "@/app/components/NavBar";
+import { useRouter } from "next/navigation";
 
 const ReplyPage = () => {
   const params = useParams();
@@ -10,24 +11,40 @@ const ReplyPage = () => {
   const [form, setForm] = useState(null);
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (id) {
-        try {
-          const response = await fetch(`http://localhost:5000/forms/${id}`);
+    const checkUserSession = async () => {
+      try {
+        const userResponse = await fetch('http://localhost:5000/get_user', {
+          method: 'GET',
+          credentials: 'include',
+        });
+        const userData = await userResponse.json();
+
+        if (userResponse.ok && userData.user) {
+          setUser(userData.user);
+          const response = await fetch(`http://localhost:5000/forms/${id}`, {
+            method: 'GET',
+            credentials: 'include',
+          });
+          if (!response.ok) throw new Error("Form not found");
           const data = await response.json();
           setForm(data);
-        } catch (error) {
-          console.error("Error fetching form details:", error);
-        } finally {
-          setLoading(false);
+        } else {
+          router.push('/signin');
         }
+      } catch (error) {
+        console.error("Error fetching user or form details:", error);
+        router.push('/signin');
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchData();
-  }, [id]);
+    checkUserSession();
+  }, [id, router]);
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -38,23 +55,21 @@ const ReplyPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const user = JSON.parse(localStorage.getItem("user"));
-    const userId = user?.id;
-
-    if (!userId) {
+    if (!user) {
       alert("User not logged in or ID not found.");
       return;
     }
 
     const submissionData = {
       formData,
-      user_id: userId,
+      user_id: user.id,
     };
 
     try {
       const response = await fetch(`http://localhost:5000/submissions/${id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify(submissionData),
       });
       if (response.ok) {
@@ -144,14 +159,12 @@ const ReplyPage = () => {
                 )}
               </div>
             ))}
-            <div className="flex justify-center">
             <button
               type="submit"
-              className="btn bg-primary text-white px-6 py-3  rounded-md hover:bg-blue-600"
+              className="btn bg-primary text-white px-6 py-3 w-full rounded-md hover:bg-blue-600"
             >
               Submit
             </button>
-            </div>
           </form>
         </div>
       </div>

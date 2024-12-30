@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
@@ -13,30 +13,57 @@ const FormPage = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const fetchForm = async () => {
+    const checkUserSession = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/forms/${id}`);
-        if (!response.ok) throw new Error("Form not found");
-        const data = await response.json();
-        setForm(data);
+        const userResponse = await fetch('http://localhost:5000/get_user', {
+          method: 'GET',
+          credentials: 'include',
+        });
+        const userData = await userResponse.json();
+
+        if (!userResponse.ok || !userData.user) {
+          router.push('/signin');
+          return;
+        }
+
+        const fetchForm = async () => {
+          try {
+            const formResponse = await fetch(`http://localhost:5000/forms/${id}`, {
+              method: 'GET',
+              credentials: 'include',
+            });
+            if (!formResponse.ok) throw new Error("Form not found");
+            const formData = await formResponse.json();
+            setForm(formData);
+          } catch (err) {
+            setError(err.message);
+          }
+        };
+
+        fetchForm();
       } catch (err) {
         setError(err.message);
+        router.push('/signin');
       }
     };
 
-    fetchForm();
-  }, [id]);
+    checkUserSession();
+  }, [id, router]);
 
   useEffect(() => {
     if (form) {
       const fetchReplies = async () => {
         try {
-          const response = await fetch(
-            `http://localhost:5000/submissions/${form.id}`
-          );
-          if (!response.ok) throw new Error("Replies not found");
+          const response = await fetch(`http://localhost:5000/submissions/${form.id}`, {
+            method: 'GET',
+            credentials: 'include',
+          });
           const data = await response.json();
-          setReplies(data);
+          if(response.ok){
+            setReplies(data);
+          }else{
+            setReplies([]);
+          }
         } catch (err) {
           setError(err.message);
         }
@@ -64,7 +91,7 @@ const FormPage = () => {
     <>
       <NavBar />
       <hr />
-      <div className="min-h-screen bg-white w-full flex justify-center p-10  max-sm:w-[100%]">
+      <div className="min-h-screen bg-white w-full flex justify-center p-10 max-sm:w-[100%]">
         <div className="w-[80vw] bg-white p-10 shadow-2xl max-sm:w-[100%]">
           <div
             role="tablist"
@@ -157,7 +184,7 @@ const FormPage = () => {
               role="tabpanel"
               className="tab-content bg-white border-gray-300 rounded-box p-6 custom-scrollbar min-h-screen"
             >
-              <p className="text-black font-bold text-3xl  mb-8  ">Replies</p>
+              <p className="text-black font-bold text-3xl mb-8">Replies</p>
               {replies.length === 0 ? (
                 <p className="text-center text-gray-600">No replies yet.</p>
               ) : (
@@ -176,7 +203,7 @@ const FormPage = () => {
                             <div key={key} className="mb-2">
                               <strong>{key}:</strong>{" "}
                               {reply.submitted_data[key]}
-                              <hr className="my-2"></hr>
+                              <hr className="my-2" />
                             </div>
                           ))
                         ) : (

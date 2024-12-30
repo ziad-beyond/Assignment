@@ -1,29 +1,29 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const SignIn = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await fetch("http://localhost:5000/signin", {
-      method: "POST",
+    const response = await fetch('http://localhost:5000/signin', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify({ email, password }),
     });
 
     const data = await response.json();
     if (response.ok) {
-      localStorage.setItem("user", JSON.stringify(data.user));
-      router.push("/forms");
+      router.push('/forms');
     } else {
       console.log(`Sign-in failed: ${data.message}`);
       setError(data.message);
@@ -96,7 +96,7 @@ const SignIn = () => {
                   <p className="text-sm font-light text-red-500">{error}</p>
                 )}
                 <p className="text-sm font-light text-gray-500">
-                  Don’t have an account yet?{" "}
+                  Don’t have an account yet?{' '}
                   <Link
                     className="font-medium text-primary hover:underline"
                     href="/signup"
