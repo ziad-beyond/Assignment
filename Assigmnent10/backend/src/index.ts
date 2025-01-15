@@ -24,7 +24,7 @@ const cors = require("cors");
 app.use(cors());
 
 app.get('/', (req: Request, res: Response) => {
-  res.send("Welcome to my expenses tracker");
+  res.send("Welcome To my expenses tracker");
 });
 
 app.use('/', expenseRoute); 
