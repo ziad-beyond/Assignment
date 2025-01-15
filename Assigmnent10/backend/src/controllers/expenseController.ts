@@ -187,6 +187,14 @@ export const deleteExpense = async (
   }
 };
 
+
+interface Expense {
+  amount: number;
+  category: string;
+  date: Date;
+  userId: string;
+}
+
 export const getExpensesSummary = async (
   req: AuthenticatedRequest,
   res: Response,
@@ -217,23 +225,25 @@ export const getExpensesSummary = async (
     }
 
     const totalSpending = expenses.reduce(
-      (sum, expense) => sum + expense.amount,
-      0
+      (sum: number, expense: Expense) => sum + expense.amount, 
+      0 
     );
 
-    const spendingByCategory = expenses.reduce((acc, expense) => {
+    const spendingByCategory = expenses.reduce((acc: Record<string, number>, expense: Expense) => {
       if (!acc[expense.category]) {
         acc[expense.category] = 0;
       }
       acc[expense.category] += expense.amount;
       return acc;
-    }, {} as Record<string, number>);
+    }, {});
 
     const topCategories = Object.entries(spendingByCategory)
-      .sort(([, amountA], [, amountB]) => amountB - amountA)
-      .slice(0, 3)
-      .map(([category, amount]) => ({ category, amount }));
-
+    .sort(([, amountA], [, amountB]) => {
+      return (amountB as number) - (amountA as number); 
+    })
+    .slice(0, 3)
+    .map(([category, amount]) => ({ category, amount }));
+  
     res.json({
       totalSpending,
       spendingByCategory,
@@ -275,10 +285,10 @@ export const getMonthlyReport = async (
       });
 
       const totalSpending = expenses.reduce(
-        (sum, expense) => sum + expense.amount,
-        0
+        (sum: number, expense: Expense) => sum + expense.amount, 
+        0 
       );
-
+      
       monthlyTrends.push({
         month: start.toLocaleString("default", { month: "long" }),
         year: start.getFullYear(),
@@ -292,6 +302,7 @@ export const getMonthlyReport = async (
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 
 export const getCategories = async (
   req: Request,
