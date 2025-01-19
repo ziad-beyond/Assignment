@@ -36,9 +36,10 @@ export const UpdateExpenseForm: React.FC<UpdateExpenseFormProps> = ({ expenseId 
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
     const fetchCategories = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/categories");
+        const response = await axios.get(`${apiUrl}/categories`);
         setCategories(response.data || []);  
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -71,7 +72,7 @@ export const UpdateExpenseForm: React.FC<UpdateExpenseFormProps> = ({ expenseId 
         }
 
         const response = await axios.get(
-          `http://localhost:3001/expense/${expenseId}`,
+          `${apiUrl}/expense/${expenseId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -105,6 +106,7 @@ export const UpdateExpenseForm: React.FC<UpdateExpenseFormProps> = ({ expenseId 
 
   const onSubmit = async (data: any) => {
     try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
       const token = Cookies.get("token");
       if (token) {
         const decoded: any = jwtDecode(token);
@@ -130,7 +132,7 @@ export const UpdateExpenseForm: React.FC<UpdateExpenseFormProps> = ({ expenseId 
         };
   
         const response = await axios.put(
-          `http://localhost:3001/expense/${expenseId}`,
+          `${apiUrl}/expense/${expenseId}`,
           payload,
           {
             headers: {

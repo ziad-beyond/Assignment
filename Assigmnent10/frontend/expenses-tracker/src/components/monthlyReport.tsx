@@ -38,9 +38,10 @@ export function MonthlyExpensesReport() {
         if (token) {
           const decoded: any = jwtDecode(token);
           const userId = decoded.userId;
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
           const response = await axios.get(
-            "http://localhost:3001/expenses/monthly-report",
+            `${apiUrl}/expenses/monthly-report`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,

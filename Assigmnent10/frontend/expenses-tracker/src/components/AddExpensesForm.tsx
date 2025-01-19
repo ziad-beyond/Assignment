@@ -36,7 +36,8 @@ export function AddExpensesForm() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/categories");
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+        const response = await axios.get(`${apiUrl}/categories`);
         setCategories(response.data);
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -63,9 +64,9 @@ export function AddExpensesForm() {
           date: formattedDate,
         };
   
-  
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
         const response = await axios.post(
-          "http://localhost:3001/expense",
+          `${apiUrl}/expense`,
           payload,
           {
             headers: {

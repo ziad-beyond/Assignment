@@ -45,7 +45,8 @@ export function NavUser({
 
  const handleLogout = async () => {
   try {
-    await axios.post('http://localhost:3001/logout');
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    await axios.post(`${apiUrl}/logout`);
     Cookies.remove('token');
     Cookies.remove('email');
     Cookies.remove('name');

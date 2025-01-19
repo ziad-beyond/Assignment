@@ -61,7 +61,8 @@ export function LoginForm({
       return;
     }
     try {
-      const response = await axios.post("http://localhost:3001/signin", formData);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const response = await axios.post(`${apiUrl}/signin`, formData);
       const { token, email, name } = response.data;
   
       Cookies.set("token", token, {

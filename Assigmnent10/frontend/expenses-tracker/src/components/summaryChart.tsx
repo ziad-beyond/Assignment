@@ -39,8 +39,10 @@ export function SummaryComponents() {
         if (token) {
           const decoded: any = jwtDecode(token);
           const userId = decoded.userId;
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-          const response = await axios.get<SummaryData>("http://localhost:3001/expenses/summary", {
+
+          const response = await axios.get<SummaryData>(`${apiUrl}/expenses/summary`, {
             headers: {
               Authorization: `Bearer ${token}`
             },

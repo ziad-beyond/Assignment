@@ -73,7 +73,8 @@ export function SignUpForm({
     }
 
     try {
-      const response = await axios.post("http://localhost:3001/signup", formData);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const response = await axios.post(`${apiUrl}/signup`, formData);
       
       setSuccessMessage(response.data.message);
       setFormData({ email: "", name: "", password: "" });

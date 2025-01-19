@@ -27,6 +27,14 @@ app.get('/', (req: Request, res: Response) => {
   res.send("Welcome To my expenses tracker");
 });
 
+app.use(
+  cors({
+    origin:["http://localhost:3001", "https://expenses-tracker-g3ku12y2i-ziads-projects-5e62ff58.vercel.app"],
+    credentials: true, 
+  })
+);
+
+
 app.use('/', expenseRoute); 
 app.use('/', authRoute); 
 app.use(errorHandler);
@@ -34,3 +42,4 @@ app.use(errorHandler);
 app.listen(process.env.PORT, () => {
   console.log("running on port " + process.env.PORT);
 });
+

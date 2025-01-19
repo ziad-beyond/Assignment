@@ -29,14 +29,14 @@ export function ChartComponents() {
         if (token) {
           const decoded: any = jwtDecode(token);
           const userId = decoded.userId;
-
-          const response = await axios.get("http://localhost:3001/expenses/", {
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+          const response = await axios.get(`${apiUrl}/expenses/`, {
             headers: {
               Authorization: `Bearer ${token}`
             },
             params: { userId }
           });
-
+          console.log("API URL:", apiUrl); 
           setExpenses(response.data);
         } else {
           setError("No token found. Please log in.");

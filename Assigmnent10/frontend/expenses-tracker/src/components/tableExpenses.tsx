@@ -36,8 +36,8 @@ export function TableExpenses() {
         if (token) {
           const decoded: any = jwtDecode(token);
           const userId = decoded.userId;
-
-          const response = await axios.get("http://localhost:3001/expenses/", {
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+          const response = await axios.get(`${apiUrl}/expenses/`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -74,8 +74,8 @@ export function TableExpenses() {
         setError("No token found. Please log in.");
         return;
       }
-
-      const response = await axios.delete(`http://localhost:3001/expense/${id}`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const response = await axios.delete(`${apiUrl}/expense/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

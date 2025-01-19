@@ -19,8 +19,12 @@ app.use(express_1.default.json());
 const cors = require("cors");
 app.use(cors());
 app.get('/', (req, res) => {
-    res.send("Welcome to my expenses tracker");
+    res.send("Welcome To my expenses tracker");
 });
+app.use(cors({
+    origin: ["http://localhost:3001", "https://expenses-tracker-g3ku12y2i-ziads-projects-5e62ff58.vercel.app"],
+    credentials: true,
+}));
 app.use('/', expenseRoute_1.default);
 app.use('/', authRoute_1.default);
 app.use(errorHandler_1.default);
